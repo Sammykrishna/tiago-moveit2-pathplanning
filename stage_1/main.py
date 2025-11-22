@@ -10,20 +10,33 @@ angle_incr = 0.0314159281552
 TODO: this is simple just return the length of a given list.
 '''
 def get_length(scan_data):
-	return 0
+	return len(scan_data)
 
 '''
 TODO: find the index of the closest point in the scan_data
 '''
 def get_index_of_closest_point(scan_data):
-	return 0
+	min_distance = None
+	min_index = None
+
+	for i, d in enumerate(scan_data):
+		if d == 0.0 or d > 7.0:
+			continue
+		if min_distance is None or d < min_distance:
+			min_distance = d
+			min_index = i
+
+	return min_index
 
 
 '''
 TODO: calculate the angle in rad for the closest point in scan_data
 '''
 def get_angle_of_closest_point(scan_data):
-	return 0
+	index = get_index_of_closest_point(scan_data)
+	if index is None:
+		return None
+	return angle_min + index * angle_incr
 
 
 def get_laserdata(path):
@@ -44,12 +57,12 @@ if __name__ == "__main__":
 	####################
 	'''
 
-	import ipdb; ipdb.set_trace()
+	print("####################")
+	print("Python exercise")
+	print("####################")
 
 	#read raw laser data
 	scan_data = get_laserdata("laser-testdata_1")
-
-	import ipdb; ipdb.set_trace()
 
 	#print length of scan_data
 	print("Length of scan data: {0}".format(get_length(scan_data)))
