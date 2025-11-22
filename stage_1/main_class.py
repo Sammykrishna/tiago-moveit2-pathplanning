@@ -49,21 +49,39 @@ class LaserModel(object):
     '''
 
     def calc_angle_inc(self):
-        return None
+        length = self.get_scan_length()
+        if length <= 1:
+            return 0
+        return (self.angle_max - self.angle_min) / (length - 1)
 
     '''
     TODO: port your code from previous exercise
     '''
 
     def calc_index_of_closest_point(self):
-        return None
+        min_distance = None
+        min_index = None
+
+        for i, d in enumerate(self.scan_data):
+            if d == 0.0:
+                continue
+            if d < self.range_min or d > self.range_max:
+                continue
+            if min_distance is None or d < min_distance:
+                min_distance = d
+                min_index = i
+
+        return min_index
 
     '''
     TODO: port your code from previous exercise
     '''
 
     def calc_angle_of_closest_point(self):
-        return None
+        index = self.calc_index_of_closest_point()
+        if index is None:
+            return None
+        return self.angle_min + index * self.angle_inc
 
     '''
     core method for your function calls etc
@@ -86,8 +104,6 @@ if __name__ == '__main__':
     app = LaserModel(-math.pi/2, math.pi/2, 0.0, 7.0)
     app.update_laserdata("laser-testdata_2")
     app.set_angle_inc(app.calc_angle_inc())
-
-    import ipdb; ipdb.set_trace()
 
     print("-"*20 +
           str("\nAngle increment: {}" +
