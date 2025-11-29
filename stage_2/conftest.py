@@ -1,4 +1,1 @@
-pytest_plugins = [
-    "plugins.check_publisher_subscriber_tests.conftest_loader"
-]
-
+pytest_plugins = ["plugins.conftest_loader"]
