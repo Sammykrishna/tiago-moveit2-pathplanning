@@ -1,5 +1,4 @@
 pytest_plugins = [
-    "lib.check_publisher_subscriber_tests.conftest"
+    "plugins.check_publisher_subscriber_tests.conftest_loader"
 ]
 
-pytest_plugins = ["check_publisher_subscriber_tests.conftest"]
