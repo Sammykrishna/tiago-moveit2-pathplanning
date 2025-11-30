@@ -13,7 +13,7 @@ setup(
     ],
     install_requires=['setuptools', 'rclpy', 'std_msgs'],
     zip_safe=True,
-    maintainer='root',
+    maintainer='samanth krishna',
     maintainer_email='sk-246767@hs-weingarten.de',
     description='Python publisher/subscriber example',
     license='Apache-2.0',
