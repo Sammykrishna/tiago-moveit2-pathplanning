@@ -1,0 +1,10 @@
+
+
+services:
+  tiago_workspace_conainer:
+    image: my_tiago_workspace
+    extends:
+      file: .compose_templates.yml
+      service: .tiago_workspace
+    command: tail -f /dev/null
+
