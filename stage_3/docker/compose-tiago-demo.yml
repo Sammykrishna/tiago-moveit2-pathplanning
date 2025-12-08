@@ -3,7 +3,7 @@ services:
     image: fbe-dockerreg.rwu.de/prj-iki-ros2/robots/tiago/tiago_base:sim
     container_name: tiago_sim
     environment:
-      ROS_DOMAIN_ID: $ROS_DOMAIN_ID
+      ROS_DOMAIN_ID: 42
       DISPLAY: $DISPLAY
     network_mode: host
     ipc: host

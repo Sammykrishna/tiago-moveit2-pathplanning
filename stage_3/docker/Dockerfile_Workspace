@@ -1,0 +1,8 @@
+FROM fbe-dockerreg.rwu.de/prj-iki-ros2/robots/tiago/tiago_base:sim
+
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      ros-humble-rqt-robot-steering && \
+    rm -rf /var/lib/apt/lists/*
+

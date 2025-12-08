@@ -1,0 +1,15 @@
+services:
+  tiago_nav:
+    extends:
+      file: .compose_templates.yml
+      service: .tiago_sim
+    command: >-
+      ros2 launch rwu_tiago_bringup sim_robocup_2023.launch.py
+      is_public_sim:=True
+      x:=1.0
+      y:=2.0
+      yaw:=1.4
+      navigation:=True
+      slam:=False
+      map_path:=/maps/testmap.yaml
+

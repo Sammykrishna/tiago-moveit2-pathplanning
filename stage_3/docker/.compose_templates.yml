@@ -1,0 +1,48 @@
+services:
+
+  .tiago_sim:
+    image: fbe-dockerreg.rwu.de/prj-iki-ros2/robots/tiago/tiago_base:sim
+    extends: .gui_nav
+
+  .tiago_workspace:
+    image: my_tiago_workspace
+    extends: .workspace_gui
+
+  .gui:
+    extends: .common
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /run/user/1000/gdm/Xauthority:/root/.Xauthority:ro
+
+  .gui_nav:
+    extends: .common
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /run/user/1000/gdm/Xauthority:/root/.Xauthority:ro
+      - ${IKI_WORKSPACE}/ros2_ws/src/25ws_sk-246767/stage_3/maps:/maps
+
+  .workspace_gui:
+    extends: .common
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /run/user/1000/gdm/Xauthority:/root/.Xauthority:ro
+      - ${IKI_WORKSPACE}:/root
+
+  .common:
+    image: fbe-dockerreg.rwu.de/prj-iki-ros2/orga/ros2-docker-base:humble
+    environment:
+      ROS_DOMAIN_ID: $ROS_DOMAIN_ID
+      DISPLAY: $DISPLAY
+    network_mode: host
+    ipc: host
+    privileged: true
+    stdin_open: true
+
+  .common_nvidia:
+    extends: .common
+    runtime: nvidia
+    environment:
+      QT_X11_NO_MITSHM: "1"
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,video,utility,graphics
+
