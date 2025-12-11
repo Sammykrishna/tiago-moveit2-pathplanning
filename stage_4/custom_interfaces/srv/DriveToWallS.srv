@@ -1,0 +1,7 @@
+# Request: same fields as DriveToWallT
+float64 linear_x
+float64 min_distance
+---
+# Response: same fields again (simple acknowledgement)
+float64 linear_x
+float64 min_distance
