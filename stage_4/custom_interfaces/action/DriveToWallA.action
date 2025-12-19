@@ -1,0 +1,10 @@
+# Goal (same as DriveToWallT)
+float64 linear_x
+float64 min_distance
+---
+# Result (same as ReachedWallT)
+string message
+bool success
+---
+# Feedback
+float64 current_distance
