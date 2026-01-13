@@ -1,0 +1,3 @@
+[submodule "submodules/ros-2-apriltags"]
+	path = submodules/ros-2-apriltags
+	url = git@gitlab.rwu.de:mat-iki/ros-2-apriltags.git
