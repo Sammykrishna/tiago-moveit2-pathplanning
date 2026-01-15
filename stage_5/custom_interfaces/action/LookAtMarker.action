@@ -1,0 +1,7 @@
+int32 marker_id
+---
+bool success
+string message
+---
+float64 err_x
+float64 err_y
