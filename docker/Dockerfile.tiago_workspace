@@ -1,0 +1,20 @@
+FROM fbe-dockerreg.rwu.de/prj-iki-ros2/robots/tiago/tiago_base:sim-ir
+
+SHELL ["/bin/bash", "-lc"]
+
+# Create workspace
+RUN mkdir -p /root/ros2_ws/src
+
+# Copy ONLY the interfaces package into the image
+COPY submodules/moveit_wrapper_stud/moveit_wrapper_interfaces /root/ros2_ws/src/moveit_wrapper_interfaces
+
+# Build interfaces so they are available in the image environment
+RUN source /opt/ros/humble/setup.bash && \
+    cd /root/ros2_ws && \
+    rosdep update && \
+    rosdep install --from-paths src --ignore-src -r -y && \
+    colcon build --packages-select moveit_wrapper_interfaces
+
+# Optional: source on container start (nice-to-have)
+RUN echo "source /opt/ros/humble/setup.bash" >> /root/.bashrc && \
+    echo "source /root/ros2_ws/install/setup.bash" >> /root/.bashrc

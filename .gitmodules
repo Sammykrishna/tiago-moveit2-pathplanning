@@ -1,3 +1,7 @@
 [submodule "submodules/ros-2-apriltags"]
 	path = submodules/ros-2-apriltags
 	url = git@gitlab.rwu.de:mat-iki/ros-2-apriltags.git
+[submodule "submodules/moveit_wrapper_stud"]
+	path = submodules/moveit_wrapper_stud
+	url = git@gitlab.rwu.de:mat-iki/moveit-wrapper-stud.git
+	branch = humble

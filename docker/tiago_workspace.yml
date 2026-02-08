@@ -1,7 +1,10 @@
 
 
 services:
-  tiago_workspace_conainer:
+  tiago_workspace_container:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.tiago_workspace
     image: my_tiago_workspace
     extends:
       file: .compose_templates.yml

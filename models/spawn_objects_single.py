@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
+import os
 import rclpy
 from rclpy.node import Node
 from gazebo_msgs.srv import SpawnEntity
 from geometry_msgs.msg import Pose
 
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 class SpawnObjectNode(Node):
     def __init__(self):
         super().__init__('spawn_object_node')
@@ -16,9 +18,9 @@ class SpawnObjectNode(Node):
         #self.spawn_object()
 
     def spawn_marker(self,  name, marker, pose):
-        april_tag_path = "april_tags"
+        april_tag_path = os.path.join(SCRIPT_DIR, "april_tags")
 
-        with open(april_tag_path+ "/" + marker + '/model.sdf') as f:
+        with open(os.path.join(april_tag_path, marker, 'model.sdf')) as f:
             xml = f.read()
         
         request = SpawnEntity.Request()
@@ -55,7 +57,7 @@ class SpawnObjectNode(Node):
         inertia_yy = (mass / 12.0) * (x**2 + z**2)
         inertia_zz = (mass / 12.0) * (x**2 + y**2)
 
-        friction_coefficient = 2.0
+        friction_coefficient = 8.0
 
         return f"""<?xml version='1.0'?>
 <sdf version='1.6'>

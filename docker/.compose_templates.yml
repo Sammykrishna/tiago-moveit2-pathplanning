@@ -3,6 +3,7 @@ services:
   .tiago_sim:
     image: fbe-dockerreg.rwu.de/prj-iki-ros2/robots/tiago/tiago_base:sim
     extends: .gui_nav
+    
 
   .tiago_workspace:
     image: my_tiago_workspace
@@ -19,8 +20,8 @@ services:
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /run/user/1000/gdm/Xauthority:/root/.Xauthority:ro
-      - ${IKI_WORKSPACE}/ros2_ws/src/25ws_sk-246767/stage_3/maps:/maps
-
+      - ${IKI_WORKSPACE}/ros2_ws/src/25ws_sk-246767/maps:/root/maps
+      - ../config:/config
   .workspace_gui:
     extends: .common
     volumes:
