@@ -1,0 +1,3 @@
+[submodule "moveit_wrapper_interfaces_stud"]
+	path = moveit_wrapper_interfaces_stud
+	url = git@gitlab.rwu.de:mat-iki/moveit_wrapper_stud_interfaces.git

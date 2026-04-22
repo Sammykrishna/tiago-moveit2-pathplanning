@@ -1,0 +1,27 @@
+image: fbe-dockerreg.rwu.de/adm-iki/systems/gitlab-runner-docker:master
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  GIT_SUBMODULE_FORCE_HTTPS: "true"
+
+stages:
+  - docker_build
+
+
+docker:
+  stage: docker_build
+  image: docker:latest
+  variables:
+    REPOSITORY_NAME: "fbe-dockerreg.rwu.de/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME"
+    #IMAGE_TAG: "$CI_COMMIT_REF_NAME"
+    IMAGE_TAG: $CI_COMMIT_REF_NAME
+    DOCKERFILE: "docker/Dockerfile"
+  script:
+    - >
+      docker build
+      --pull
+      --no-cache
+      --tag $REPOSITORY_NAME:$IMAGE_TAG
+      -f $DOCKERFILE
+      .
+    - docker push $REPOSITORY_NAME:$IMAGE_TAG

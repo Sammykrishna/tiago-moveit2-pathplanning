@@ -1,0 +1,9 @@
+#Returns all gripper attached objects
+
+string move_group
+---
+
+visualization_msgs/Marker[] objects
+bool success
+string message
+

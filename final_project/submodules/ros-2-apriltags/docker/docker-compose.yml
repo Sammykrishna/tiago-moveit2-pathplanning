@@ -1,0 +1,19 @@
+services:
+  apriltag_detection:
+    container_name: ros2_apriltag_detection
+    image: fbe-dockerreg.rwu.de/prj-iki-ros2/perception/apriltag:humble
+    environment:
+      ROS_DOMAIN_ID: $ROS_DOMAIN_ID
+    network_mode: host
+    restart: 'unless-stopped'
+    privileged: true
+    stdin_open: true
+    tty: true
+    volumes:
+      - ../configs/:/root/ros2_ws/install/apriltag_ros/share/apriltag_ros/cfg
+    command: 
+    - bash 
+    - -c 
+    - |
+        ros2 run apriltag_ros apriltag_node --ros-args -r image_rect:=/zed2i/zed_node/rgb_raw/image_raw_color -r camera_info:=/zed2i/zed_node/rgb_raw/camera_info  --params-file `ros2 pkg prefix apriltag_ros`/share/apriltag_ros/cfg/tags_36h11.yaml
+

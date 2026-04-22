@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>moveit_wrapper</name>
+  <version>1.1.4</version>
+  <description>ROS2 component wrapper for MoveIt2.</description>
+  <maintainer email="maik.knof@gmx.de">Maik Knof</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>moveit_wrapper_interfaces</depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_components</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_geometry_msgs</depend>
+  <depend>moveit_ros_planning_interface</depend>
+  <depend>moveit_ros_planning</depend>
+  <depend>moveit_core</depend>
+  <!--<depend>moveit_cpp</depend>-->
+  <depend>geometry_msgs</depend>
+  <depend>shape_msgs</depend>
+  <depend>visualization_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>moveit_msgs</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+    <rclcpp_components/>
+  </export>
+</package>

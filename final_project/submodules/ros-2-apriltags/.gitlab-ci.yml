@@ -1,0 +1,13 @@
+image: fbe-dockerreg.rwu.de/adm-iki/systems/gitlab-runner-docker:master
+#image: docker:20.10.14
+
+stages:
+    - docker
+
+apriltag_ros_humble:
+    stage: docker
+    tags:
+       - image-build
+    script: 
+    - docker build -t fbe-dockerreg.rwu.de/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:humble -f docker/Dockerfile .
+    - docker push fbe-dockerreg.rwu.de/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:humble

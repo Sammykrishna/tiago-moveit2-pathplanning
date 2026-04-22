@@ -1,22 +1,20 @@
 #!/usr/bin/env python3
 import sys
 import time
-import math
 import rclpy
 from rclpy.node import Node
 from rclpy.action import ActionClient
-from geometry_msgs.msg import PoseStamped, TransformStamped
+from geometry_msgs.msg import PoseStamped
 from tf2_ros import Buffer, TransformListener
-import tf2_geometry_msgs
 from visualization_msgs.msg import Marker
 from apriltag_msgs.msg import AprilTagDetectionArray
 from control_msgs.action import FollowJointTrajectory
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from moveit_wrapper_interfaces.srv import AddColObj, RemoveColObj
 
-class CollisionObjectsTest(Node):
+class SceneAnalysis(Node):
     def __init__(self):
-        super().__init__("test_collision_objects")
+        super().__init__("scene_analysis")
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
         
@@ -27,10 +25,8 @@ class CollisionObjectsTest(Node):
         
         self.apriltag_sub = self.create_subscription(AprilTagDetectionArray, '/detections', self.apriltag_callback, 10)
         
-        self.apriltag_detected = False
-        self.apriltag_frame = None
-        self.apriltag_id = None
-        self.latest_detection = None
+        # Store all detections by ID
+        self.tag_detections = {}
         self.camera_frame = None
         
         self.wait_for_services()
@@ -44,15 +40,11 @@ class CollisionObjectsTest(Node):
 
     def apriltag_callback(self, msg):
         if msg.detections:
-            detection = msg.detections[0]
-            self.apriltag_id = detection.id
-            self.apriltag_frame = f"tag_{detection.id}"
-            self.latest_detection = detection
             self.camera_frame = msg.header.frame_id
-            if not self.apriltag_detected:
-                self.apriltag_detected = True
+            for detection in msg.detections:
+                self.tag_detections[detection.id] = detection
 
-    def move_head_to_look_down(self, pan=0.0, tilt=-0.9):
+    def move_head_to_look_down(self, pan=0.0, tilt=-0.6):
         goal_msg = FollowJointTrajectory.Goal()
         trajectory = JointTrajectory()
         trajectory.joint_names = ['head_1_joint', 'head_2_joint']
@@ -73,16 +65,18 @@ class CollisionObjectsTest(Node):
         rclpy.spin_until_future_complete(self, result_future, timeout_sec=10.0)
         return True
 
-    def wait_for_apriltag(self, timeout_sec=30.0):
+    def wait_for_apriltags(self, required_ids, timeout_sec=30.0):
         start_time = time.time()
-        while rclpy.ok() and not self.apriltag_detected:
+        while rclpy.ok():
             rclpy.spin_once(self, timeout_sec=0.1)
+            if all(tag_id in self.tag_detections for tag_id in required_ids):
+                return True
             if time.time() - start_time > timeout_sec:
                 return False
-        return True
+        return False
 
-    def get_apriltag_pose_in_base_link(self):
-        if not self.latest_detection or not self.camera_frame:
+    def get_apriltag_pose_in_base_link(self, tag_id):
+        if tag_id not in self.tag_detections or not self.camera_frame:
             return None
         try:
             estimated_distance = 0.5
@@ -106,10 +100,10 @@ class CollisionObjectsTest(Node):
         except:
             return None
 
-    def create_marker_relative_to_apriltag(self, marker_type, offset_x, offset_y, offset_z, scale_x, scale_y, scale_z, ns="collision_object"):
-        if not self.apriltag_detected:
+    def create_marker_relative_to_apriltag(self, tag_id, marker_type, offset_x, offset_y, offset_z, scale_x, scale_y, scale_z, ns="collision_object"):
+        if tag_id not in self.tag_detections:
             return None
-        tag_pose = self.get_apriltag_pose_in_base_link()
+        tag_pose = self.get_apriltag_pose_in_base_link(tag_id)
         if tag_pose is None:
             return None
         marker = Marker()
@@ -173,39 +167,80 @@ class CollisionObjectsTest(Node):
             return False
         time.sleep(3.0)
         
-        if not self.wait_for_apriltag(timeout_sec=30.0):
+        # Wait for all required tags
+        required_ids = [1, 2, 3, 11]
+        if not self.wait_for_apriltags(required_ids, timeout_sec=30.0):
             return False
         time.sleep(2.0)
         
         self.clear_collision_objects()
         
+        markers = []
+        
+        # Table (tag 11)
         table_marker = self.create_marker_relative_to_apriltag(
+            tag_id=11,
             marker_type=Marker.CYLINDER,
-            offset_x=0.3,
+            offset_x=0.0,
             offset_y=0.0,
-            offset_z=-0.10,
-            scale_x=0.65,
-            scale_y=0.65,
-            scale_z=0.05,
+            offset_z=-0.015,
+            scale_x=0.52,
+            scale_y=0.52,
+            scale_z=0.04,
             ns="table"
         )
         if table_marker is None:
             return False
+        markers.append(table_marker)
         
-        object_marker = self.create_marker_relative_to_apriltag(
+        # Object 1 (tag 1)
+        object1_marker = self.create_marker_relative_to_apriltag(
+            tag_id=1,
             marker_type=Marker.CUBE,
-            offset_x=0.2,
-            offset_y=0.0,
-            offset_z=0.04,
-            scale_x=0.06,
+            offset_x=0.028,
+            offset_y=0.01,
+            offset_z=0.08,
+            scale_x=0.04,
             scale_y=0.06,
-            scale_z=0.08,
-            ns="object"
+            scale_z=0.15,
+            ns="object_1"
         )
-        if object_marker is None:
+        if object1_marker is None:
             return False
+        markers.append(object1_marker)
         
-        markers = [table_marker, object_marker]
+        # Object 2 (tag 2)
+        object2_marker = self.create_marker_relative_to_apriltag(
+            tag_id=2,
+            marker_type=Marker.CUBE,
+            offset_x=0.028,
+            offset_y=0.01,
+            offset_z=0.08,
+            scale_x=0.04,
+            scale_y=0.06,
+            scale_z=0.15,
+            ns="object_2"
+        )
+        if object2_marker is None:
+            return False
+        markers.append(object2_marker)
+        
+        # Object 3 (tag 3)
+        object3_marker = self.create_marker_relative_to_apriltag(
+            tag_id=3,
+            marker_type=Marker.CUBE,
+            offset_x=0.028,
+            offset_y=0.01,
+            offset_z=0.08,
+            scale_x=0.04,
+            scale_y=0.06,
+            scale_z=0.15,
+            ns="object_3"
+        )
+        if object3_marker is None:
+            return False
+        markers.append(object3_marker)
+        
         if not self.add_collision_objects(markers):
             return False
         
@@ -213,7 +248,7 @@ class CollisionObjectsTest(Node):
 
 def main():
     rclpy.init()
-    node = CollisionObjectsTest()
+    node = SceneAnalysis()
     try:
         success = node.run_test()
         if success:

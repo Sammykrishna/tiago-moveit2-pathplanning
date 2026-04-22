@@ -5,14 +5,14 @@ services:
       service: .tiago_sim
     command: >
       ros2 launch rwu_tiago_bringup sim_robocup_2023.launch.py
-      x:=-4.15 y:=2.26 yaw:=1.61 is_public_sim:=True map_path:=/maps/myfirstmap.yaml
+      x:=-4.15 y:=2.26 yaw:=1.61 is_public_sim:=True use_sim_time:=True navigation:=True slam:=False  map_path:=/maps/testmap.yaml
 
 
   rviz:
     extends:
       file: .compose_templates.yml
       service: .tiago_sim
-    command: rviz2 -d /config/moveit2.rviz
+    command: rviz2 -d /config/moveit2.rviz x:=-4.15 y:=2.26 yaw:=1.61  map_path:=/maps/testmap.yaml&  navigation:=True
 
   tiago_workspace:
     image: fbe-dockerreg.rwu.de/prj-iki-ros2/robots/tiago/tiago_base:sim

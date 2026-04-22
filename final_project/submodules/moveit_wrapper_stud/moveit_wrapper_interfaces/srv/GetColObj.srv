@@ -1,0 +1,7 @@
+#Returns all collision objects in the planning scene
+
+---
+
+visualization_msgs/Marker[] objects
+bool success
+string message

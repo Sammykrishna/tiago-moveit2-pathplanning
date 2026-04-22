@@ -1,0 +1,8 @@
+# Request
+string move_group
+---
+
+# Response
+string[] names
+bool success
+string message

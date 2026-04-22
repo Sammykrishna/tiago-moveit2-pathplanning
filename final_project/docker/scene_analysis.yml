@@ -1,0 +1,61 @@
+services:
+  tiago_base:
+    extends:
+      file: .compose_templates.yml
+      service: .tiago_sim
+    
+    command: >
+      ros2 launch rwu_tiago_bringup sim_robocup_2023.launch.py
+      x:=-4.15 y:=2.26 yaw:=1.61 is_public_sim:=True map_path:=/maps/testmap_backup.yaml
+
+  rviz:
+    extends:
+      file: .compose_templates.yml
+      service: .tiago_sim
+    command: >
+      bash -c "sleep 15 && rviz2 -d /config/moveit2.rviz"
+    depends_on:
+      - tiago_base
+
+  apriltag_detection:
+    extends:
+      file: ros2-apriltag.yml
+      service: apriltag_detection
+    depends_on:
+      - tiago_base
+
+  moveit_wrapper:
+    extends:
+      file: ../submodules/moveit_wrapper_stud/docker/compose-gpu.yaml
+      service: moveit_wrapper
+    depends_on:
+      - tiago_base
+
+  tiago_workspace:
+    image: fbe-dockerreg.rwu.de/prj-iki-ros2/robots/tiago/tiago_base:sim
+    extends:
+      file: .compose_templates.yml
+      service: .workspace_gui
+    depends_on:
+      - tiago_base
+      - moveit_wrapper
+      - apriltag_detection
+    # Spawns all tags + objects, then keeps the container alive.
+    # Run your solution node manually inside this container, e.g.:
+    #   ros2 run clean_the_table scene_analysis
+    command: >
+      bash -lc "
+        cd /root/ros2_ws/src/25ws_sk-246767/models;
+        python3 spawn_objects_clean_table.py &
+        echo '[scene_analysis] Spawn script running. Now run: ros2 run clean_the_table scene_analysis';
+        
+        sleep 20;
+        cd /root/ros2_ws;
+        colcon build --symlink-install --packages-select moveit_wrapper_interfaces clean_the_table;
+        source /root/ros2_ws/install/setup.bash;
+        sleep 5;
+        ros2 run clean_the_table scene_analysis --ros-args -p use_sim_time:=true;
+
+        tail -f /dev/null
+
+      "

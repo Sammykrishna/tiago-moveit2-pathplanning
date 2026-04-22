@@ -1,0 +1,18 @@
+services:
+  moveit_wrapper:
+    env_file: [.env]
+    image: fbe-dockerreg.rwu.de/mat-iki/moveit-wrapper-stud:humble
+    container_name: moveit_wrapper_stud
+    build:
+      dockerfile: docker/Dockerfile
+      context: ..
+    network_mode: host
+    ipc: host
+    privileged: true
+    stdin_open: true
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /run/user/1000/gdm/Xauthority:/root/.Xauthority:ro
+      - ../moveit_wrapper:/root/ros2_ws/src/moveit_wrapper
+      - ../scripts:/scripts
+    command: ros2 launch moveit_wrapper moveit_wrapper.launch.py start_rviz:=False use_sim_time:=True

@@ -1,0 +1,16 @@
+/**:
+  ros__parameters:
+    planning_group: "panda_arm"
+    base_frame: "panda_link0"
+    ee_frame: "panda_hand"
+    tf_timeout: 0.2
+    planning_pipeline: ompl
+    planner_id: ""
+    planning_time: 15.0
+    max_velocity_scaling_factor: 0.5
+    max_acceleration_scaling_factor: 0.5
+    planning_attempts: 10
+
+    gripper_touch_links: #TODO figure out links
+      - gripper_left_finger_link
+      - gripper_right_finger_link

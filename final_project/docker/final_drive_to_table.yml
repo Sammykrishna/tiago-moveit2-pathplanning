@@ -1,0 +1,48 @@
+services:
+  tiago_base:
+    extends:
+      file: .compose_templates.yml
+      service: .tiago_sim
+    # Start pose for final drive task
+    command: >
+      ros2 launch rwu_tiago_bringup sim_robocup_2023.launch.py
+      x:=-3.0 y:=-1.0 yaw:=1.6 is_public_sim:=True navigation:=True slam:=False map_path:=/maps/testmap_backup.yaml
+  
+      
+
+#  rviz:
+#    extends:
+#      file: .compose_templates.yml
+#      service: .tiago_sim
+#    command: >
+#      bash -c "sleep 15 && rviz2 -d /config/moveit2.rviz"
+#    depends_on:
+#      - tiago_base
+
+  # AprilTag detection (optional for driving, but kept for consistency)
+  apriltag_detection:
+    extends:
+      file: ros2-apriltag.yml
+      service: apriltag_detection
+    depends_on:
+      - tiago_base
+
+  tiago_workspace:
+    image: fbe-dockerreg.rwu.de/prj-iki-ros2/robots/tiago/tiago_base:sim
+    extends:
+      file: .compose_templates.yml
+      service: .workspace_gui
+    command: >
+      bash -lc "
+        cd /root/ros2_ws;
+        colcon build --symlink-install --packages-select clean_the_table || exit 1;
+        source /root/ros2_ws/install/setup.bash;
+        sleep 5;
+        ros2 run gazebo_ros spawn_entity.py -entity door -database counter -x -3.0 -y 0.0 -z 0 -Y 0;
+        sleep 15;
+        ros2 run clean_the_table drive_to_table
+        tail -f /dev/null
+      "
+    depends_on:
+      - tiago_base
+      - apriltag_detection

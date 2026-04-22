@@ -1,0 +1,55 @@
+services:
+  tiago_base:
+    extends:
+      file: .compose_templates.yml
+      service: .tiago_sim
+    command: >
+      ros2 launch rwu_tiago_bringup sim_robocup_2023.launch.py
+      x:=-4.15 y:=2.26 yaw:=1.61 is_public_sim:=True use_sim_time:=True navigation:=True slam:=False  map_path:=/maps/testmap.yaml
+
+
+  rviz:
+    extends:
+      file: .compose_templates.yml
+      service: .tiago_sim
+    command: rviz2 -d /config/moveit2.rviz x:=-4.15 y:=2.26 yaw:=1.61  map_path:=/maps/testmap.yaml&  navigation:=True
+
+  tiago_workspace:
+    image: fbe-dockerreg.rwu.de/prj-iki-ros2/robots/tiago/tiago_base:sim
+    extends:
+      file: .compose_templates.yml
+      service: .workspace_gui
+    command: >
+      bash -lc "
+        set -e;
+        source /opt/ros/humble/setup.bash;
+        cd /root/ros2_ws;
+
+        # Build only what we need (fast) – add more packages if required
+        colcon build --symlink-install --packages-select moveit_wrapper_interfaces moveit_wrapper_test || true;
+
+        source install/setup.bash;
+        sleep 10;
+        # Spawn gazebo objects + tag on startup
+        python3 /root/ros2_ws/src/25ws_sk-246767/models/spawn_objects_clean_table.py &
+
+        exec tail -f /dev/null
+      "
+    depends_on:
+      - tiago_base
+      - moveit_wrapper
+      - apriltag_detection
+
+
+
+
+
+  moveit_wrapper:
+    extends:
+      file: ../submodules/moveit_wrapper_stud/docker/compose-gpu.yaml
+      service: moveit_wrapper
+
+  apriltag_detection:
+    extends:
+      file: ros2-apriltag.yml
+      service: apriltag_detection
